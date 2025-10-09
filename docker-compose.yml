@@ -6,4 +6,4 @@ services:
       - "8000:8000"
     volumes:
       - .:/app:ro
-      - ./data:/app/data
+      - ./data:/app/data # deploy test 
