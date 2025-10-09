@@ -20,9 +20,10 @@ jobs:
 
     - name: Copy files to server
       run: |
-        rsync -avz --delete \
+        rsync -avz --delete --exclude 'data/' \
           -e "ssh -o StrictHostKeyChecking=no" \
           ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/marketmap-backend
+
 
     - name: Restart Docker Compose on server
       run: |
