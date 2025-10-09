@@ -1,7 +1,5 @@
-# Market Map 
+# MarketMap - Backend (Python FastApi)
 
-## Docker
-- docker build -t marketmap-backend .
-- docker run -d -p 8000:8000 marketmap-backend
-
-- docker compose up
+## App for City Markets and Events with Backend
+First Events in Backend: 
+- Weihnachtsmarkt Leipzig
