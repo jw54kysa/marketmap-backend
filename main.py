@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Depends
-
 from fastapi.responses import JSONResponse
 from sqladmin import Admin, ModelView
 from sqlalchemy.orm import Session
@@ -33,8 +32,15 @@ def get_db():
     finally:
         db.close()
 
-# API endpoint to fetch all stands
+# STATUS
+@app.get("/api/status")
+def get_status(db: Session = Depends(get_db)):
+    count = db.query(Stand).count()
+    return JSONResponse(content={"stand_count": count})
 
+
+# STANDS
+# get list
 @app.get("/api/stands")
 def get_all_stands(db: Session = Depends(get_db)):
     stands = db.query(Stand).all()
@@ -53,8 +59,3 @@ def get_all_stands(db: Session = Depends(get_db)):
         for s in stands
     ]
     return JSONResponse(content=result)
-
-@app.get("/api/status")
-def get_status(db: Session = Depends(get_db)):
-    count = db.query(Stand).count()
-    return JSONResponse(content={"stand_count": count})

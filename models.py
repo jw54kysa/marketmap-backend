@@ -1,10 +1,13 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean
+from sqlalchemy import Column, Integer, String, Float, Boolean, LargeBinary
 from database import Base
 
 class Stand(Base):
     __tablename__ = "stands"
 
     id = Column(Integer, primary_key=True, index=True)
+    city = Column(String, nullable=False, default="LPZ")
+    event = Column(String, nullable=False, default="WNM25")
+    section = Column(String, nullable=True)
     name = Column(String, nullable=False)
     icon = Column(String, nullable=True)
     type = Column(String, nullable=True)
@@ -14,4 +17,4 @@ class Stand(Base):
     open_time = Column(String, nullable=True)
     close_time = Column(String, nullable=True)
     is_active = Column(Boolean, nullable=True)
-
+    image = Column(String, nullable=True)
