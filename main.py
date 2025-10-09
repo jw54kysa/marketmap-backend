@@ -53,3 +53,8 @@ def get_all_stands():
     ]
     return JSONResponse(content=result)
 
+@app.get("/api/status")
+def get_status():
+    db: Session = next(get_db())
+    count = db.query(Stand).count()
+    return JSONResponse(content={"stand_count": count})
