@@ -1,0 +1,9 @@
+services:
+  fastapi:
+    build: .
+    container_name: marketmap-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app:ro # mount your source code read-only
+      - ./data:/app/data # mount a writable volume for the DB
