@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.responses import JSONResponse
 from sqladmin import Admin, ModelView
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 from database import engine, SessionLocal, Base
 from models import Stand
 
@@ -56,6 +56,6 @@ def get_all_stands(db: Session = Depends(get_db)):
             "lat": s.lat,
             "lng": s.lng
         }
-        for s in stands if s.isActive == True
+        for s in stands if s.is_active
     ]
     return JSONResponse(content=result)
