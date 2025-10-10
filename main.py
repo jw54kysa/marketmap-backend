@@ -2,9 +2,10 @@ from fastapi import FastAPI, Depends
 from fastapi.responses import JSONResponse
 from sqladmin import Admin, ModelView
 from sqlalchemy.orm import Session
-from markupsafe import Markup
 from database import engine, SessionLocal, Base
 from models import Stand, Offer
+from schemas import StandSchema
+from typing import List
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -48,22 +49,7 @@ def get_status(db: Session = Depends(get_db)):
 
 # STANDS
 # get list
-@app.get("/api/stands")
+@app.get("/api/stands", response_model=List[StandSchema])
 def get_all_stands(db: Session = Depends(get_db)):
-    stands = db.query(Stand).all()
-    result = [
-        {
-            "id": s.id,
-            "name": s.name,
-            "icon": s.icon,
-            "type": s.type,
-            "info": s.info,
-            "offers": s.offers,
-            "open_time": s.open_time,
-            "close_time": s.close_time,
-            "lat": s.lat,
-            "lng": s.lng
-        }
-        for s in stands if s.is_active
-    ]
-    return JSONResponse(content=result)
+    stands = db.query(Stand).filter(Stand.is_active == True).all()
+    return stands
