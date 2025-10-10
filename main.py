@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Depends
 from fastapi.responses import JSONResponse
 from sqladmin import Admin, ModelView
-from sqlalchemy.orm import Session, relationship
+from sqlalchemy.orm import Session
+from markupsafe import Markup
 from database import engine, SessionLocal, Base
-from models import Stand
+from models import Stand, Offer
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -16,13 +17,20 @@ admin = Admin(app=app, engine=engine, title="Stände Admin")
 
 # Admin view for Stand
 class StandAdmin(ModelView, model=Stand):
-    column_list = ["id", "name", "icon", "type", "info", "offers", "open_time", "close_time", "lat", "lng"]
+    column_list = ["id", "name", "offers", "icon", "type", "info", "open_time", "close_time", "lat", "lng"]
+    can_create = True
+    can_edit = True
+    can_delete = True
+
+class OfferAdmin(ModelView, model=Offer):
+    column_list = ["id", "name", "price", "stand_id"]
     can_create = True
     can_edit = True
     can_delete = True
 
 # Register admin view
 admin.add_view(StandAdmin)
+admin.add_view(OfferAdmin)
 
 # Dependency to get DB session
 def get_db():
