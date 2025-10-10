@@ -16,7 +16,7 @@ admin = Admin(app=app, engine=engine, title="Stände Admin")
 
 # Admin view for Stand
 class StandAdmin(ModelView, model=Stand):
-    column_list = ["id", "name", "icon", "type", "info", "open_time", "close_time", "lat", "lng"]
+    column_list = ["id", "name", "icon", "type", "info", "offers", "open_time", "close_time", "lat", "lng"]
     can_create = True
     can_edit = True
     can_delete = True
@@ -38,7 +38,6 @@ def get_status(db: Session = Depends(get_db)):
     count = db.query(Stand).count()
     return JSONResponse(content={"stand_count": count})
 
-
 # STANDS
 # get list
 @app.get("/api/stands")
@@ -51,11 +50,12 @@ def get_all_stands(db: Session = Depends(get_db)):
             "icon": s.icon,
             "type": s.type,
             "info": s.info,
+            "offers": s.offers,
             "open_time": s.open_time,
             "close_time": s.close_time,
             "lat": s.lat,
             "lng": s.lng
         }
-        for s in stands
+        for s in stands if s.isActive == True
     ]
     return JSONResponse(content=result)

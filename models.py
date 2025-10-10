@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, LargeBinary
+from sqlalchemy import Column, Integer, String, Float, Boolean, JSON
+from sqlalchemy.ext.mutable import MutableList
 from database import Base
 
 class Stand(Base):
@@ -11,6 +12,7 @@ class Stand(Base):
     name = Column(String, nullable=False)
     icon = Column(String, nullable=True)
     type = Column(String, nullable=True)
+    offers = Column(MutableList.as_mutable(JSON), default=[])
     info = Column(String, nullable=True)
     lat = Column(Float, nullable=True)
     lng = Column(Float, nullable=True)
