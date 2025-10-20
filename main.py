@@ -65,7 +65,7 @@ def get_all_stands(db: Session = Depends(get_db)):
                 .filter(DeviceStandRating.stand_id == stand.id) \
                 .scalar()
         # add avg_rating to the stand object dynamically
-        stand.avg_rating = float(avg) if avg is not None else None
+        stand.rating = float(avg) if avg is not None else None
         stand_list.append(stand)
 
     return stand_list
