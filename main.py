@@ -3,8 +3,8 @@ from fastapi.responses import JSONResponse
 from sqladmin import Admin, ModelView
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal, Base
-from models import Stand, Offer, Device, DeviceActivation
-from schemas import StandSchema, DeviceInitSchema, DeviceInitResponseSchema, DeviceResponsesSchema
+from models import Stand, Offer, Device, DeviceActivation, DeviceStandRating
+from schemas import StandSchema, DeviceInitSchema, DeviceInitResponseSchema, DeviceResponsesSchema, RatingSchema
 from typing import List
 from fastapi.staticfiles import StaticFiles
 
@@ -88,3 +88,40 @@ def get_all_device_activations(db: Session = Depends(get_db)):
         response.append({"uuid": device.uuid, "activations": timestamps})
     
     return response
+
+
+# Rating 
+
+@app.post("/api/stands/rate")
+def rate_stand(rating_data: RatingSchema, db: Session = Depends(get_db)):
+    # Check or create device
+    device = db.query(Device).filter(Device.uuid == rating_data.device_uuid).first()
+    if not device:
+        device = Device(uuid=rating_data.device_uuid)
+        db.add(device)
+        db.commit()
+        db.refresh(device)
+    
+    # Check if stand exists
+    stand = db.query(Stand).filter(Stand.id == rating_data.stand_id).first()
+    if not stand:
+        raise HTTPException(status_code=404, detail="Stand not found")
+    
+    # Check if a rating already exists
+    existing_rating = db.query(DeviceStandRating).filter(
+        DeviceStandRating.device_id == device.id,
+        DeviceStandRating.stand_id == stand.id
+    ).first()
+    
+    if existing_rating:
+        existing_rating.rating = rating_data.rating  # update rating
+    else:
+        new_rating = DeviceStandRating(
+            device_id=device.id,
+            stand_id=stand.id,
+            rating=rating_data.rating
+        )
+        db.add(new_rating)
+    
+    db.commit()
+    return {"message": "Rating submitted successfully"}

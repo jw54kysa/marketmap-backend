@@ -19,7 +19,7 @@ class Stand(Base):
     name = Column(String, nullable=False)
     icon = Column(String, nullable=True)
     type = Column(String, nullable=True)
-
+    
     offers = relationship(
         "Offer",
         secondary=stand_offer_association,
@@ -34,6 +34,7 @@ class Stand(Base):
     is_active = Column(Boolean, nullable=True, default=True)
     image = Column(String, nullable=True)
 
+    device_ratings = relationship("DeviceStandRating", back_populates="stand", cascade="all, delete-orphan")
 
 class Offer(Base):
     __tablename__ = "offers"
@@ -58,6 +59,8 @@ class Device(Base):
     id = Column(Integer, primary_key=True, index=True)
     uuid = Column(String, unique=True, index=True)
     activations = relationship("DeviceActivation", back_populates="device", cascade="all, delete-orphan")
+    
+    stand_ratings = relationship("DeviceStandRating", back_populates="device", cascade="all, delete-orphan")
 
 
 class DeviceActivation(Base):
@@ -68,3 +71,14 @@ class DeviceActivation(Base):
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
     
     device = relationship("Device", back_populates="activations")
+
+
+class DeviceStandRating(Base):
+    __tablename__ = "device_stand_ratings"
+
+    device_id = Column(Integer, ForeignKey("devices.id"), primary_key=True)
+    stand_id = Column(Integer, ForeignKey("stands.id"), primary_key=True)
+    rating = Column(Integer, nullable=False)
+
+    device = relationship("Device", back_populates="stand_ratings")
+    stand = relationship("Stand", back_populates="device_ratings")

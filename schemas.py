@@ -31,6 +31,9 @@ class StandSchema(BaseModel):
     class Config:
         orm_mode = True
 
+
+# Tracker Device Activation
+
 class DeviceInitSchema(BaseModel):
     uuid: str
 
