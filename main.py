@@ -6,12 +6,16 @@ from database import engine, SessionLocal, Base
 from models import Stand, Offer
 from schemas import StandSchema
 from typing import List
+from fastapi.staticfiles import StaticFiles
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
 # Initialize FastAPI app
 app = FastAPI()
+
+# Mount a folder to serve images
+app.mount("/images", StaticFiles(directory="/root/sources/images"), name="images")
 
 # SQLAdmin setup
 admin = Admin(app=app, engine=engine, title="Stände Admin")
