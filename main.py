@@ -7,6 +7,7 @@ from models import Stand, Offer, Device, DeviceActivation, DeviceStandRating
 from schemas import StandSchema, DeviceInitSchema, DeviceInitResponseSchema, DeviceResponsesSchema, RatingSchema
 from typing import List
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import func
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -56,7 +57,18 @@ def get_status(db: Session = Depends(get_db)):
 @app.get("/api/stands", response_model=List[StandSchema])
 def get_all_stands(db: Session = Depends(get_db)):
     stands = db.query(Stand).filter(Stand.is_active == True).all()
-    return stands
+    
+    # Compute average rating for each stand
+    stand_list = []
+    for stand in stands:
+        avg = db.query(func.avg(DeviceStandRating.rating)) \
+                .filter(DeviceStandRating.stand_id == stand.id) \
+                .scalar()
+        # add avg_rating to the stand object dynamically
+        stand.avg_rating = float(avg) if avg is not None else None
+        stand_list.append(stand)
+
+    return stand_list
 
 
 # Tracker

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, conint
 from datetime import datetime
 from typing import List, Optional
 
@@ -27,6 +27,7 @@ class StandSchema(BaseModel):
     close_time: Optional[str]
     image: Optional[str]
     offers: List[OfferSchema]
+    rating: Optional[float]
 
     class Config:
         orm_mode = True
@@ -47,3 +48,10 @@ class DeviceResponsesSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+# Rating
+
+class RatingSchema(BaseModel):
+    device_uuid: str
+    stand_id: int
+    rating: conint(ge=1, le=5)
