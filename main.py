@@ -15,7 +15,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 # Mount a folder to serve images
-app.mount("/images", StaticFiles(directory="/root/sources/images"), name="images")
+app.mount("/images", StaticFiles(directory="images"), name="images")
 
 # SQLAdmin setup
 admin = Admin(app=app, engine=engine, title="Stände Admin")

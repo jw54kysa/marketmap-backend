@@ -7,3 +7,4 @@ services:
     volumes:
       - .:/app:ro
       - ./data:/app/data
+      - /root/sources/images:/app/images:ro
