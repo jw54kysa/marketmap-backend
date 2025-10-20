@@ -58,7 +58,7 @@ def get_all_stands(db: Session = Depends(get_db)):
     stands = db.query(Stand).filter(Stand.is_active == True).all()
     return stands
 
-@app.post("/api/device/activate", response_model=DeviceResponseSchema)
+@app.post("/api/device/activate", response_model=DeviceActivationSchema)
 def register_device_activation(activation: DeviceActivationSchema, db: Session = Depends(get_db)):
     device = db.query(Device).filter(Device.uuid == activation.uuid).first()
     if not device:

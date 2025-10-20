@@ -36,6 +36,7 @@ class DeviceActivationSchema(BaseModel):
 
 class DeviceResponseSchema(BaseModel):
     uuid: str
+    activations: List[datetime]
 
     class Config:
         orm_mode = True
