@@ -4,7 +4,7 @@ from sqladmin import Admin, ModelView
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal, Base
 from models import Stand, Offer, Device, DeviceActivation
-from schemas import StandSchema, DeviceActivationSchema, DeviceResponseSchema
+from schemas import StandSchema, DeviceInitSchema, DeviceInitResponseSchema, DeviceResponsesSchema
 from typing import List
 from fastapi.staticfiles import StaticFiles
 
@@ -58,8 +58,8 @@ def get_all_stands(db: Session = Depends(get_db)):
     stands = db.query(Stand).filter(Stand.is_active == True).all()
     return stands
 
-@app.post("/api/device/activate", response_model=DeviceActivationSchema)
-def register_device_activation(activation: DeviceActivationSchema, db: Session = Depends(get_db)):
+@app.post("/api/tracker/activate", response_model=DeviceInitResponseSchema)
+def register_device_activation(activation: DeviceInitSchema, db: Session = Depends(get_db)):
     device = db.query(Device).filter(Device.uuid == activation.uuid).first()
     if not device:
         device = Device(uuid=activation.uuid)
@@ -72,16 +72,15 @@ def register_device_activation(activation: DeviceActivationSchema, db: Session =
     db.commit()
     db.refresh(new_activation)
 
-    return {"uuid": device.uuid}
+    return {"uuid": device.uuid, "markets": "25_lpz_wm"}
 
 
-@app.get("/api/devices/activations", response_model=List[DeviceResponseSchema])
+@app.get("/api/tracker/activations", response_model=List[DeviceResponsesSchema])
 def get_all_device_activations(db: Session = Depends(get_db)):
     devices = db.query(Device).all()
     
     response = []
     for device in devices:
-        # Convert DeviceActivation objects to datetime list
         timestamps = [activation.timestamp for activation in device.activations]
         response.append({"uuid": device.uuid, "activations": timestamps})
     

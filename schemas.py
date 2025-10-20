@@ -31,10 +31,14 @@ class StandSchema(BaseModel):
     class Config:
         orm_mode = True
 
-class DeviceActivationSchema(BaseModel):
+class DeviceInitSchema(BaseModel):
     uuid: str
 
-class DeviceResponseSchema(BaseModel):
+class DeviceInitResponseSchema(BaseModel):
+    uuid: str
+    markets: List[str]
+
+class DeviceResponsesSchema(BaseModel):
     uuid: str
     activations: List[datetime]
 
