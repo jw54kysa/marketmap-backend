@@ -3,8 +3,8 @@ from fastapi.responses import JSONResponse
 from sqladmin import Admin, ModelView
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal, Base
-from models import Stand, Offer
-from schemas import StandSchema
+from models import Stand, Offer, Device, DeviceActivation
+from schemas import StandSchema, DeviceActivationSchema, DeviceResponseSchema
 from typing import List
 from fastapi.staticfiles import StaticFiles
 
@@ -57,3 +57,32 @@ def get_status(db: Session = Depends(get_db)):
 def get_all_stands(db: Session = Depends(get_db)):
     stands = db.query(Stand).filter(Stand.is_active == True).all()
     return stands
+
+@app.post("/api/device/activate", response_model=DeviceResponseSchema)
+def register_device_activation(activation: DeviceActivationSchema, db: Session = Depends(get_db)):
+    device = db.query(Device).filter(Device.uuid == activation.uuid).first()
+    if not device:
+        device = Device(uuid=activation.uuid)
+        db.add(device)
+        db.commit()
+        db.refresh(device)
+
+    new_activation = DeviceActivation(device_id=device.id)
+    db.add(new_activation)
+    db.commit()
+    db.refresh(new_activation)
+
+    return {"uuid": device.uuid}
+
+
+@app.get("/api/devices/activations", response_model=List[DeviceResponseSchema])
+def get_all_device_activations(db: Session = Depends(get_db)):
+    devices = db.query(Device).all()
+    
+    response = []
+    for device in devices:
+        # Convert DeviceActivation objects to datetime list
+        timestamps = [activation.timestamp for activation in device.activations]
+        response.append({"uuid": device.uuid, "activations": timestamps})
+    
+    return response

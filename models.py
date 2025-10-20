@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, String, Float, Boolean, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, Float, Boolean, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -50,3 +50,21 @@ class Offer(Base):
     
     def __str__(self):
         return f"{self.name} (${self.price})"
+
+
+class Device(Base):
+    __tablename__ = "devices"
+
+    id = Column(Integer, primary_key=True, index=True)
+    uuid = Column(String, unique=True, index=True)
+    activations = relationship("DeviceActivation", back_populates="device", cascade="all, delete-orphan")
+
+
+class DeviceActivation(Base):
+    __tablename__ = "device_activations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    device_id = Column(Integer, ForeignKey("devices.id"))
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    
+    device = relationship("Device", back_populates="activations")
