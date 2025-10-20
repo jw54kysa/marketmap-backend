@@ -55,3 +55,8 @@ class RatingSchema(BaseModel):
     device_uuid: str
     stand_id: int
     rating: conint(ge=1, le=5)
+
+class DeviceStandRatingResponse(BaseModel):
+    device_uuid: str
+    stand_id: int
+    rating: Optional[int]

@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqladmin import Admin, ModelView
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal, Base
 from models import Stand, Offer, Device, DeviceActivation, DeviceStandRating
-from schemas import StandSchema, DeviceInitSchema, DeviceInitResponseSchema, DeviceResponsesSchema, RatingSchema
+from schemas import StandSchema, DeviceInitSchema, DeviceInitResponseSchema, DeviceResponsesSchema, RatingSchema, DeviceStandRatingResponse
 from typing import List
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func
@@ -137,3 +137,27 @@ def rate_stand(rating_data: RatingSchema, db: Session = Depends(get_db)):
     
     db.commit()
     return {"message": "Rating submitted successfully"}
+
+@app.get("/api/stands/rating", response_model=DeviceStandRatingResponse)
+def get_device_rating(device_uuid: str, stand_id: int, db: Session = Depends(get_db)):
+    # Find device
+    device = db.query(Device).filter(Device.uuid == device_uuid).first()
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    # Find stand
+    stand = db.query(Stand).filter(Stand.id == stand_id).first()
+    if not stand:
+        raise HTTPException(status_code=404, detail="Stand not found")
+    
+    # Find rating
+    rating_entry = db.query(DeviceStandRating).filter(
+        DeviceStandRating.device_id == device.id,
+        DeviceStandRating.stand_id == stand.id
+    ).first()
+    
+    return DeviceStandRatingResponse(
+        device_uuid=device_uuid,
+        stand_id=stand_id,
+        rating=rating_entry.rating if rating_entry else None
+    )
