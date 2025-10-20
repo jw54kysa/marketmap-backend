@@ -58,6 +58,9 @@ def get_all_stands(db: Session = Depends(get_db)):
     stands = db.query(Stand).filter(Stand.is_active == True).all()
     return stands
 
+
+# Tracker
+
 @app.post("/api/tracker/activate", response_model=DeviceInitResponseSchema)
 def register_device_activation(activation: DeviceInitSchema, db: Session = Depends(get_db)):
     device = db.query(Device).filter(Device.uuid == activation.uuid).first()
@@ -72,7 +75,7 @@ def register_device_activation(activation: DeviceInitSchema, db: Session = Depen
     db.commit()
     db.refresh(new_activation)
 
-    return {"uuid": device.uuid, "markets": "25_lpz_wm"}
+    return {"uuid": device.uuid, "markets": ["25_lpz_wm"]}
 
 
 @app.get("/api/tracker/activations", response_model=List[DeviceResponsesSchema])
