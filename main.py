@@ -150,12 +150,20 @@ def get_device_rating(device_uuid: str, stand_id: int, db: Session = Depends(get
     # Find device
     device = db.query(Device).filter(Device.uuid == device_uuid).first()
     if not device:
-        raise HTTPException(status_code=404, detail="Device not found")
+        return DeviceStandRatingResponse(
+            device_uuid=device_uuid,
+            stand_id=stand_id,
+            rating=None
+        )
     
     # Find stand
     stand = db.query(Stand).filter(Stand.id == stand_id).first()
     if not stand:
-        raise HTTPException(status_code=404, detail="Stand not found")
+        return DeviceStandRatingResponse(
+            device_uuid=device_uuid,
+            stand_id=stand_id,
+            rating=None
+        )
     
     # Find rating
     rating_entry = db.query(DeviceStandRating).filter(
