@@ -1,11 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
 from sqladmin import Admin, ModelView
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal, Base
 from models import Stand, Offer, Device, DeviceActivation, DeviceStandRating
-from schemas import StandSchema, DeviceInitSchema, DeviceInitResponseSchema, DeviceResponsesSchema, RatingSchema, DeviceStandRatingResponse
-from typing import List
+from schemas import *
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func
 
@@ -55,16 +54,24 @@ def get_status(db: Session = Depends(get_db)):
 # STANDS
 # get list
 @app.get("/api/stands", response_model=List[StandSchema])
-def get_all_stands(db: Session = Depends(get_db)):
-    stands = db.query(Stand).filter(Stand.is_active == True).all()
-    
+def get_all_stands(
+    event: Optional[str] = Query(None, description="Event code to filter stands"),
+    db: Session = Depends(get_db)
+):
+    query = db.query(Stand).filter(Stand.is_active == True)
+
+    # Filter by city if provided
+    if event:
+        query = query.filter(Stand.event == event)
+
+    stands = query.all()
+
     # Compute average rating for each stand
     stand_list = []
     for stand in stands:
         avg = db.query(func.avg(DeviceStandRating.rating)) \
                 .filter(DeviceStandRating.stand_id == stand.id) \
                 .scalar()
-        # add avg_rating to the stand object dynamically
         stand.rating = float(avg) if avg is not None else None
         stand_list.append(stand)
 

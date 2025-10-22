@@ -13,8 +13,8 @@ class Stand(Base):
     __tablename__ = "stands"
 
     id = Column(Integer, primary_key=True, index=True)
-    city = Column(String, nullable=False, default="LPZ")
-    event = Column(String, nullable=False, default="WNM25")
+    city = Column(String, nullable=False, default="lpz")
+    event = Column(String, nullable=False, default="25_lpz_wm")
     section = Column(String, nullable=True, default="markt")
     name = Column(String, nullable=False)
     icon = Column(String, nullable=True)
