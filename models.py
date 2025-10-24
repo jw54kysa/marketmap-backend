@@ -18,7 +18,8 @@ class Stand(Base):
     section = Column(String, nullable=True, default="markt")
     name = Column(String, nullable=False)
     icon = Column(String, nullable=True)
-    type = Column(String, nullable=True)
+    type_id = Column(Integer, ForeignKey("types.id"), nullable=True)
+    type = relationship("Type", backref="stands")
     
     offers = relationship(
         "Offer",
@@ -51,6 +52,16 @@ class Offer(Base):
     
     def __str__(self):
         return f"{self.name} (${self.price})"
+    
+class Type(Base):
+    __tablename__ = "types"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    icon = Column(String, nullable=True)
+    color = Column(String, nullable=True)
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 class Device(Base):

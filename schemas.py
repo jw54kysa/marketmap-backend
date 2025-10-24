@@ -11,6 +11,14 @@ class OfferSchema(BaseModel):
     class Config:
         orm_mode = True
 
+class TypeSchema(BaseModel):
+    id: int
+    name: str
+    icon: Optional[str]
+    color: Optional[str]
+
+    class Config:
+        orm_mode = True
 
 class StandSchema(BaseModel):
     id: int
@@ -19,7 +27,8 @@ class StandSchema(BaseModel):
     section: Optional[str]
     name: str
     icon: Optional[str]
-    type: Optional[str]
+    type: Optional[TypeSchema]
+    type_id: Optional[int]
     info: Optional[str]
     lat: Optional[float]
     lng: Optional[float]

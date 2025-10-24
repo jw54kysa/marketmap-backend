@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from sqladmin import Admin, ModelView
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal, Base
-from models import Stand, Offer, Device, DeviceActivation, DeviceStandRating
+from models import *
 from schemas import *
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func
@@ -15,7 +15,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 # Mount a folder to serve images
-app.mount("/images", StaticFiles(directory="data/images"), name="images")
+#app.mount("/images", StaticFiles(directory="data/images"), name="images")
 
 # SQLAdmin setup
 admin = Admin(app=app, engine=engine, title="Stände Admin")
@@ -33,9 +33,16 @@ class OfferAdmin(ModelView, model=Offer):
     can_edit = True
     can_delete = True
 
+class TypeAdmin(ModelView, model=Type):
+    column_list = ["id", "name", "icon", "color"]
+    can_create = True
+    can_edit = True
+    can_delete = True
+
 # Register admin view
 admin.add_view(StandAdmin)
 admin.add_view(OfferAdmin)
+admin.add_view(TypeAdmin)
 
 # Dependency to get DB session
 def get_db():
